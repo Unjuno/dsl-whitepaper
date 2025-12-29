@@ -1,0 +1,63 @@
+# Model Manifest サンプル
+# JSON変換タスクに特化したモデルの例
+
+model_id: spec-llm.jsonfixer
+version: 0.1.0
+
+base_model:
+  model_id: generalist-llm
+  version: 1.0.0
+  base_hash: "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+
+artifacts:
+  weights:
+    filename: jsonfixer-q4.gguf
+    sha256: "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210"
+
+license: Apache-2.0
+
+scope:
+  tasks:
+    - json_transform
+    - schema_conform
+    - json_formatting
+  non_scope:
+    - open_ended_creative_writing
+    - medical_advice
+    - legal_advice
+    - pii_handling
+
+io_contract:
+  input:
+    max_tokens: 2048
+    required_format: "prompt+schema"
+    description: "プロンプトとJSON Schemaの組み合わせ"
+  output:
+    format: json
+    schema_ref: "schemas/output.schema.json"
+    description: "JSON形式で、指定されたスキーマに準拠"
+
+verifier:
+  type: json_schema
+  pass_condition: "schema_valid == true"
+  config:
+    schema_path: "schemas/output.schema.json"
+    strict_mode: true
+
+routing:
+  tags:
+    - "format:json"
+    - "task:transform"
+    - "task:format"
+  recommended_min_confidence: 0.65
+  fallback: "generalist-llm"
+
+metadata:
+  author: "Community Contributor"
+  description: "JSON変換・整形・スキーマ準拠の出力に特化したモデル"
+  training_data:
+    source: "winner_logs"
+    period: "2025-01-01 to 2025-01-31"
+  known_limitations:
+    - "スキーマが曖昧/矛盾していると誤解釈が増える"
+    - "非常に複雑なネスト構造は苦手"

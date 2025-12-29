@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DSL Run Log Schema",
+  "description": "推論実行ログの形式定義（JSONL形式の各行）",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "prompt_hash",
+    "model_id",
+    "metric_version",
+    "verifier_result",
+    "reward",
+    "proxy_values"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601形式の実行時刻"
+    },
+    "prompt_hash": {
+      "type": "string",
+      "description": "プロンプトのハッシュ（sha256推奨）",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "model_id": {
+      "type": "string",
+      "description": "使用モデルID"
+    },
+    "metric_version": {
+      "type": "string",
+      "description": "使用したメトリクスバージョン",
+      "pattern": "^v\\d+$"
+    },
+    "verifier_result": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"],
+      "description": "検証結果"
+    },
+    "reward": {
+      "type": "number",
+      "description": "報酬値（Rₖ(x)）"
+    },
+    "proxy_values": {
+      "type": "object",
+      "required": ["quality", "cost", "refusal_penalty"],
+      "properties": {
+        "quality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "品質proxy（0-1、大きいほど良い）"
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0,
+          "description": "コストproxy（正規化済み、小さいほど良い）"
+        },
+        "refusal_penalty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "拒否ペナルティ（0-1、小さいほど良い）"
+        }
+      }
+    },
+    "winner_model_id": {
+      "type": "string",
+      "description": "勝者モデルID（学習時のみ記録）"
+    },
+    "input_tokens": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "入力トークン数"
+    },
+    "output_tokens": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "出力トークン数"
+    },
+    "time_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "実行時間（ミリ秒）"
+    }
+  }
+}

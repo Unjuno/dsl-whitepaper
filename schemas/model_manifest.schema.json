@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DSL Model Manifest Schema",
+  "description": "特化モデルのメタデータ定義",
+  "type": "object",
+  "required": [
+    "model_id",
+    "version",
+    "base_model",
+    "artifacts",
+    "license",
+    "scope",
+    "io_contract",
+    "verifier",
+    "routing"
+  ],
+  "properties": {
+    "model_id": {
+      "type": "string",
+      "description": "一意のモデル識別子",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+    },
+    "version": {
+      "type": "string",
+      "description": "セマンティックバージョン",
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    },
+    "base_model": {
+      "type": "object",
+      "required": ["model_id", "version", "base_hash"],
+      "properties": {
+        "model_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "base_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["weights"],
+      "properties": {
+        "weights": {
+          "type": "object",
+          "required": ["filename", "sha256"],
+          "properties": {
+            "filename": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "license": {
+      "type": "string",
+      "enum": ["Apache-2.0", "MIT", "BSD-2-Clause", "BSD-3-Clause"]
+    },
+    "scope": {
+      "type": "object",
+      "required": ["tasks", "non_scope"],
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "non_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "io_contract": {
+      "type": "object",
+      "required": ["input", "output"],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": ["max_tokens", "required_format"],
+          "properties": {
+            "max_tokens": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "required_format": {
+              "type": "string"
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": ["format"],
+          "properties": {
+            "format": {
+              "type": "string"
+            },
+            "schema_ref": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "verifier": {
+      "type": "object",
+      "required": ["type", "pass_condition"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["json_schema", "unit_test", "static_analysis", "rule_check"]
+        },
+        "pass_condition": {
+          "type": "string"
+        },
+        "config": {
+          "type": "object"
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "required": ["tags", "recommended_min_confidence", "fallback"],
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "recommended_min_confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "fallback": {
+          "type": "string"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "training_data": {
+          "type": "object"
+        },
+        "known_limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
